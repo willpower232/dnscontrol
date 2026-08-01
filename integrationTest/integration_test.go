@@ -186,7 +186,14 @@ func makeTests() []*TestGroup {
 			tc("Change MX apex", mx("@", 5, "bar.com.")),
 			tc("Create MX", mx("testmx", 5, "foo.com.")),
 			tc("Change MX target", mx("testmx", 5, "bar.com.")),
-			tc("Change MX p", mx("testmx", 100, "bar.com.")),
+		),
+
+		testgroup("MX",
+			not(
+				"NAMECHEAP",
+			),
+			tc("Create MX", mx("testmx", 5, "foo.com.")),
+			tc("Change MX p", mx("testmx", 100, "foo.com.")),
 		),
 
 		testgroup("RP",
@@ -491,6 +498,7 @@ func makeTests() []*TestGroup {
 				"GANDI_V5",          // "Gandi does not support changing apex NS records. Ignoring ns1.foo.com."
 				"JOKER",             // Not supported via the Zone API.
 				"NAMEDOTCOM",        // "Ignores @ for NS records"
+				"NAMECHEAP",         // cannot handle single NS at apex but does handle dual
 				"NETCUP",            // NS records not currently supported.
 				"PORKBUN",           // Record ignored.
 				"SAKURACLOUD",       // Silently ignores requests to remove NS at @.
@@ -799,11 +807,19 @@ func makeTests() []*TestGroup {
 			tc("CAA record", caa("@", 0, "issue", "letsencrypt.org")),
 			tc("CAA change tag", caa("@", 0, "issuewild", "letsencrypt.org")),
 			tc("CAA change target", caa("@", 0, "issuewild", "example.com")),
-			tc("CAA change flag", caa("@", 128, "issuewild", "example.com")),
-			tc("CAA many records", caa("@", 128, "issuewild", ";")),
+			tc("CAA many records", caa("@", 0, "issuewild", ";")),
 			// Test support of spaces in the 3rd field. Some providers don't
 			// support this.  See providers/exoscale/auditrecords.go as an example.
 			tc("CAA whitespace", caa("@", 0, "issue", "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1234")),
+		),
+
+		testgroup("CAA",
+			requires(providers.CanUseCAA),
+			not(
+				"NAMECHEAP",
+			),
+			tc("CAA record", caa("@", 0, "issue", "letsencrypt.org")),
+			tc("CAA change flag", caa("@", 128, "issue", "letsencrypt.org")),
 		),
 
 		// LOCation records. // No.47
