@@ -127,6 +127,8 @@ providers.RegisterCredsMetadata("MYPROVIDER", providers.CredsMetadata{
 })
 ```
 
+The wizard appends the `creds.json` key and `(required)` or `(optional)` to the `Label` itself, so leave those out of the label text.
+
 A field can carry any of the following flags:
 
 | Flag | Effect |
@@ -135,6 +137,7 @@ A field can carry any of the following flags:
 | `Secret` | Input is masked. |
 | `Multiline` | Opens `$EDITOR` so PEM blocks and other multi line values can be entered intact. |
 | `Choices` | Input is restricted to a fixed list. |
+| `ConfirmValue` | Asks a yes/no question instead of free text. Yes writes this value to `creds.json`, no leaves the key out. Use it for on/off settings such as a sandbox flag. |
 | `EnvVar` | When the environment variable is set, its value becomes the default. |
 | `Internal` | Marks a selector whose answer only drives `ShowIf` logic. The value is not written to `creds.json`. |
 | `ShowIf` | Only ask this field when earlier field answers match the given key/value map. Used to branch between auth methods. |
